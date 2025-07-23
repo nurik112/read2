@@ -63,9 +63,9 @@
   </div>
 
   <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbXXXXXXXXXXXX/exec"; // ← kendi dağıtım URL’in buraya
     const docList = document.getElementById('docList');
     const storedDocs = JSON.parse(localStorage.getItem('docs') || '[]');
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzgtCXRci24QKY6eZcKbn4mcmvv53Ql4bCx9F8bF93Iv19vBM_100Zn3TLw7k6o36wi/exec"; // kendi Apps Script Web App URL'ini buraya yapıştır
 
     function renderDocs() {
       docList.innerHTML = '';
@@ -88,17 +88,13 @@
 
       if (text.trim()) {
         const name = prompt('Enter a name for this document:');
-        if (name) {
-          sendToDrive(name, text);
-        }
+        if (name) sendToDrive(name, text);
       } else if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
         const reader = new FileReader();
         reader.onload = function(e) {
           const name = prompt('Enter a name for this document:');
-          if (name) {
-            sendToDrive(name, e.target.result);
-          }
+          if (name) sendToDrive(name, e.target.result);
         };
         reader.readAsText(file);
       } else {
@@ -109,19 +105,23 @@
     function sendToDrive(name, content) {
       fetch(scriptURL, {
         method: 'POST',
-        body: JSON.stringify({ name, content }),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, content })
       })
       .then(res => res.json())
       .then(data => {
-        storedDocs.push({ name, content });
-        localStorage.setItem('docs', JSON.stringify(storedDocs));
-        renderDocs();
-        document.getElementById('textInput').value = '';
-        document.getElementById('fileInput').value = '';
-        alert("Uploaded to Google Drive: " + name);
+        if (data.status === "success") {
+          storedDocs.push({ name, content });
+          localStorage.setItem('docs', JSON.stringify(storedDocs));
+          renderDocs();
+          document.getElementById('textInput').value = '';
+          document.getElementById('fileInput').value = '';
+          alert("Uploaded: " + name);
+        } else {
+          alert("Upload error: " + data.message);
+        }
       })
-      .catch(err => alert("Upload failed"));
+      .catch(err => alert("Upload failed: " + err.message));
     }
 
     renderDocs();
