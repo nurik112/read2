@@ -44,6 +44,12 @@
     button:hover {
       background-color: #1a252f;
     }
+    .message {
+      color: red;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -51,6 +57,8 @@
     <h2>Create an Account</h2>
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
+    <input type="password" id="confirmPassword" placeholder="Confirm Password" />
+    <div id="errorMessage" class="message"></div>
     <button onclick="signUp()">Sign Up</button>
   </div>
 
@@ -74,9 +82,26 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    function validatePassword(password) {
+      const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+      return strongRegex.test(password);
+    }
+
     function signUp() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+      const errorMessage = document.getElementById("errorMessage");
+
+      if (password !== confirmPassword) {
+        errorMessage.textContent = "Passwords do not match.";
+        return;
+      }
+
+      if (!validatePassword(password)) {
+        errorMessage.textContent = "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.";
+        return;
+      }
 
       auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
@@ -90,7 +115,7 @@
           window.location.href = "profile-setup.html";
         })
         .catch((error) => {
-          alert("Error: " + error.message);
+          errorMessage.textContent = error.message;
         });
     }
   </script>
