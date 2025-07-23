@@ -6,7 +6,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
     const firebaseConfig = {
@@ -21,17 +21,27 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
     getAnalytics(app);
 
     window.signUp = async function () {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-
       try {
         await createUserWithEmailAndPassword(auth, email, password);
         alert("Kayıt başarılı! Hoş geldin " + email);
       } catch (error) {
         alert("Hata: " + error.message);
+      }
+    };
+
+    window.googleLogin = async function () {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        alert("Google ile giriş başarılı! Hoş geldin " + user.email);
+      } catch (error) {
+        alert("Google giriş hatası: " + error.message);
       }
     };
   </script>
@@ -107,13 +117,9 @@
     .login-box button:hover {
       background-color: #1a252f;
     }
-    .login-box p {
-      text-align: center;
-      margin-top: 1rem;
-    }
-    .login-box a {
-      color: #2980b9;
-      text-decoration: none;
+    .login-box .google-btn {
+      background-color: #dd4b39;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -136,7 +142,7 @@
       <input type="email" id="email" placeholder="Email">
       <input type="password" id="password" placeholder="Password">
       <button onclick="signUp()">Sign Up</button>
-      <p>Already have an account? <a href="#">Login</a></p>
+      <button class="google-btn" onclick="googleLogin()">Sign Up with Google</button>
     </div>
   </div>
 </body>
