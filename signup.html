@@ -83,7 +83,7 @@
     const db = firebase.firestore();
 
     function validatePassword(password) {
-      const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
       return strongRegex.test(password);
     }
 
@@ -99,7 +99,7 @@
       }
 
       if (!validatePassword(password)) {
-        errorMessage.textContent = "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.";
+        errorMessage.textContent = "Password must be at least 8 characters long and include uppercase, lowercase, and a number.";
         return;
       }
 
