@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>MyLangRead - Login</title>
+  <title>MyLangRead - Sign Up</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
     const firebaseConfig = {
@@ -24,12 +24,12 @@
     const provider = new GoogleAuthProvider();
     getAnalytics(app);
 
-    window.login = async function () {
+    window.signUp = async function () {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-        alert("Giriş başarılı! Hoş geldin " + email);
+        await createUserWithEmailAndPassword(auth, email, password);
+        alert("Kayıt başarılı! Hoş geldin " + email);
         window.location.href = "library.html";
       } catch (error) {
         alert("Hata: " + error.message);
@@ -40,7 +40,7 @@
       try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        alert("Google ile giriş başarılı! Hoş geldin " + user.email);
+        alert("Google ile kayıt başarılı! Hoş geldin " + user.email);
         window.location.href = "library.html";
       } catch (error) {
         alert("Google giriş hatası: " + error.message);
@@ -123,12 +123,12 @@
       background-color: #dd4b39;
       margin-top: 10px;
     }
-    .login-box .signup-link {
+    .login-box .login-link {
       margin-top: 15px;
       display: block;
       text-align: center;
     }
-    .login-box .signup-link a {
+    .login-box .login-link a {
       color: #2980b9;
       text-decoration: none;
     }
@@ -146,16 +146,16 @@
     </div>
   </nav>
   <div class="hero">
-    <h1>Login to MyLangRead</h1>
-    <p>Access your saved texts and progress.</p>
+    <h1>Join MyLangRead</h1>
+    <p>Create an account to start your personalized learning journey.</p>
     <div class="login-box">
-      <h2>Login</h2>
+      <h2>Sign Up</h2>
       <input type="email" id="email" placeholder="Email">
       <input type="password" id="password" placeholder="Password">
-      <button onclick="login()">Login</button>
-      <button class="google-btn" onclick="googleLogin()">Login with Google</button>
-      <div class="signup-link">
-        <p>Don't have an account? <a href="index.html">Sign up here</a></p>
+      <button onclick="signUp()">Sign Up</button>
+      <button class="google-btn" onclick="googleLogin()">Sign Up with Google</button>
+      <div class="login-link">
+        <p>Already have an account? <a href="login.html">Login here</a></p>
       </div>
     </div>
   </div>
