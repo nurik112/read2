@@ -119,9 +119,29 @@
     .login-box button:hover {
       background-color: #1a252f;
     }
-    .login-box .google-btn {
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px;
       background-color: #dd4b39;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
       margin-top: 10px;
+      transition: background-color 0.3s;
+    }
+    .google-btn:hover {
+      background-color: #c23321;
+    }
+    .google-icon {
+      width: 20px;
+      height: 20px;
     }
     .login-box .login-link {
       margin-top: 15px;
@@ -153,7 +173,10 @@
       <input type="email" id="email" placeholder="Email">
       <input type="password" id="password" placeholder="Password">
       <button onclick="signUp()">Sign Up</button>
-      <button class="google-btn" onclick="googleLogin()">Sign Up with Google</button>
+      <button class="google-btn" onclick="googleLogin()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" class="google-icon">
+        Sign Up with Google
+      </button>
       <div class="login-link">
         <p>Already have an account? <a href="login.html">Login here</a></p>
       </div>
