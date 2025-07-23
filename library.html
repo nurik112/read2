@@ -1,43 +1,129 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MyLangRead - Library</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Library - MyLangRead</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f2f4f8;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      resize: vertical;
+    }
+    input[type="file"] {
+      margin: 1rem 0;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .documents {
+      margin-top: 2rem;
+    }
+    .doc-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      color: #2980b9;
+    }
+    .doc-item:hover {
+      background: #f9f9f9;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h2>Upload Text</h2>
+    <textarea id="textInput" placeholder="Paste your text here..."></textarea><br/>
+    <input type="file" id="fileInput" accept=".txt"><br/>
+    <button onclick="uploadText()">Upload</button>
 
-  <!-- NAVBAR -->
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="library.html">Library</a>
-    <a href="texts.html">Texts</a>
-    <a href="flashcards.html">Flashcards</a>
-    <a href="login.html">Login</a>
-  </nav>
-
-  <!-- LIBRARY CONTENT -->
-  <div class="library-container">
-    <h2>Your Documents</h2>
-    <p>Click to view, edit, or delete your documents.</p>
-
-    <div class="document-list">
-      <div class="document-item">
-        <span>Document 1</span>
-        <button>View</button>
-        <button>Edit</button>
-        <button>Delete</button>
-      </div>
-      <div class="document-item">
-        <span>Document 2</span>
-        <button>View</button>
-        <button>Edit</button>
-        <button>Delete</button>
+    <div class="documents">
+      <h3>Saved Documents</h3>
+      <div id="docList">
+        <!-- Document list will appear here -->
       </div>
     </div>
-
-    <button class="add-doc">Add New Document</button>
   </div>
 
+  <script>
+    const docList = document.getElementById('docList');
+    const storedDocs = JSON.parse(localStorage.getItem('docs') || '[]');
+
+    function renderDocs() {
+      docList.innerHTML = '';
+      storedDocs.forEach((doc, index) => {
+        const div = document.createElement('div');
+        div.className = 'doc-item';
+        div.innerText = doc.name;
+        div.onclick = () => {
+          localStorage.setItem('currentDoc', JSON.stringify(doc));
+          window.location.href = 'reader.html';
+        };
+        docList.appendChild(div);
+      });
+    }
+
+    function uploadText() {
+      const textArea = document.getElementById('textInput');
+      const fileInput = document.getElementById('fileInput');
+      const text = textArea.value;
+
+      if (text.trim()) {
+        const name = prompt('Enter a name for this document:');
+        if (name) {
+          storedDocs.push({ name, content: text });
+          localStorage.setItem('docs', JSON.stringify(storedDocs));
+          renderDocs();
+          textArea.value = '';
+        }
+      } else if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const name = prompt('Enter a name for this document:');
+          if (name) {
+            storedDocs.push({ name, content: e.target.result });
+            localStorage.setItem('docs', JSON.stringify(storedDocs));
+            renderDocs();
+            fileInput.value = '';
+          }
+        };
+        reader.readAsText(file);
+      } else {
+        alert('Please enter text or choose a file.');
+      }
+    }
+
+    renderDocs();
+  </script>
 </body>
 </html>
