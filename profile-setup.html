@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Profile Setup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #43cea2, #185a9d);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    select {
+      width: 100%;
+      padding: 12px;
+      margin: 1rem 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #185a9d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #154c86;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Select Your Languages</h2>
+
+    <label for="native">🌍 Your Native Language:</label>
+    <select id="native">
+      <option value="">Select...</option>
+      <option value="zh">🇨🇳 Chinese (Mandarin)</option>
+      <option value="es">🇪🇸 Spanish</option>
+      <option value="en">🇺🇸 English</option>
+      <option value="hi">🇮🇳 Hindi</option>
+      <option value="ar">🇸🇦 Arabic</option>
+      <option value="bn">🇧🇩 Bengali</option>
+      <option value="fr">🇫🇷 French</option>
+      <option value="ru">🇷🇺 Russian</option>
+      <option value="pt">🇵🇹 Portuguese</option>
+      <option value="ur">🇵🇰 Urdu</option>
+      <option value="id">🇮🇩 Indonesian</option>
+      <option value="de">🇩🇪 German</option>
+      <option value="ja">🇯🇵 Japanese</option>
+      <option value="sw">🇰🇪 Swahili</option>
+      <option value="mr">🇮🇳 Marathi</option>
+      <option value="te">🇮🇳 Telugu</option>
+      <option value="tr">🇹🇷 Turkish</option>
+      <option value="ko">🇰🇷 Korean</option>
+      <option value="ta">🇮🇳 Tamil</option>
+      <option value="vi">🇻🇳 Vietnamese</option>
+      <option value="fa">🇮🇷 Persian</option>
+      <option value="it">🇮🇹 Italian</option>
+      <option value="pl">🇵🇱 Polish</option>
+      <option value="nl">🇳🇱 Dutch</option>
+      <option value="th">🇹🇭 Thai</option>
+      <option value="gu">🇮🇳 Gujarati</option>
+      <option value="pa">🇮🇳 Punjabi</option>
+      <option value="uk">🇺🇦 Ukrainian</option>
+      <option value="ms">🇲🇾 Malay</option>
+      <option value="ro">🇷🇴 Romanian</option>
+    </select>
+
+    <label for="target">🎯 Your Target Language:</label>
+    <select id="target">
+      <!-- Aynı diller tekrar -->
+      <option value="">Select...</option>
+      <option value="zh">🇨🇳 Chinese (Mandarin)</option>
+      <option value="es">🇪🇸 Spanish</option>
+      <option value="en">🇺🇸 English</option>
+      <option value="hi">🇮🇳 Hindi</option>
+      <option value="ar">🇸🇦 Arabic</option>
+      <option value="bn">🇧🇩 Bengali</option>
+      <option value="fr">🇫🇷 French</option>
+      <option value="ru">🇷🇺 Russian</option>
+      <option value="pt">🇵🇹 Portuguese</option>
+      <option value="ur">🇵🇰 Urdu</option>
+      <option value="id">🇮🇩 Indonesian</option>
+      <option value="de">🇩🇪 German</option>
+      <option value="ja">🇯🇵 Japanese</option>
+      <option value="sw">🇰🇪 Swahili</option>
+      <option value="mr">🇮🇳 Marathi</option>
+      <option value="te">🇮🇳 Telugu</option>
+      <option value="tr">🇹🇷 Turkish</option>
+      <option value="ko">🇰🇷 Korean</option>
+      <option value="ta">🇮🇳 Tamil</option>
+      <option value="vi">🇻🇳 Vietnamese</option>
+      <option value="fa">🇮🇷 Persian</option>
+      <option value="it">🇮🇹 Italian</option>
+      <option value="pl">🇵🇱 Polish</option>
+      <option value="nl">🇳🇱 Dutch</option>
+      <option value="th">🇹🇭 Thai</option>
+      <option value="gu">🇮🇳 Gujarati</option>
+      <option value="pa">🇮🇳 Punjabi</option>
+      <option value="uk">🇺🇦 Ukrainian</option>
+      <option value="ms">🇲🇾 Malay</option>
+      <option value="ro">🇷🇴 Romanian</option>
+    </select>
+
+    <button onclick="saveLanguages()">Continue</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRSfHfAntvwULjnhdxiZyxIPWOTTQdJu8",
+      authDomain: "read2-22428.firebaseapp.com",
+      projectId: "read2-22428",
+      storageBucket: "read2-22428.firebasestorage.app",
+      messagingSenderId: "638272572521",
+      appId: "1:638272572521:web:5581ab23942d49593ca6f8"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    function saveLanguages() {
+      const native = document.getElementById("native").value;
+      const target = document.getElementById("target").value;
+      const user = auth.currentUser;
+
+      if (!native || !target || !user) {
+        alert("Please select both languages.");
+        return;
+      }
+
+      db.collection("users").doc(user.uid).update({
+        nativeLanguage: native,
+        targetLanguage: target
+      }).then(() => {
+        window.location.href = "dashboard.html";
+      }).catch(err => {
+        alert("Error: " + err.message);
+      });
+    }
+  </script>
+</body>
+</html>
