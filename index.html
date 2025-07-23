@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MyLangRead - Sign Up</title>
+  <meta charset="UTF-8" />
+  <title>MyLangRead - Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
     const firebaseConfig = {
@@ -17,19 +17,19 @@
       messagingSenderId: "638272572521",
       appId: "1:638272572521:web:5581ab23942d49593ca6f8",
       measurementId: "G-31PBME5TMN"
-     };
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
     getAnalytics(app);
 
-    window.signUp = async function () {
+    window.emailLogin = async function () {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        alert("Kayıt başarılı! Hoş geldin " + email);
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Giriş başarılı! Hoş geldin " + email);
         window.location.href = "library.html";
       } catch (error) {
         alert("Hata: " + error.message);
@@ -40,7 +40,7 @@
       try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        alert("Google ile kayıt başarılı! Hoş geldin " + user.email);
+        alert("Google ile giriş başarılı! Hoş geldin " + user.email);
         window.location.href = "library.html";
       } catch (error) {
         alert("Google giriş hatası: " + error.message);
@@ -162,23 +162,23 @@
       <a href="library.html">Library</a>
       <a href="texts.html">Texts</a>
       <a href="flashcards.html">Flashcards</a>
-      <a href="login.html">Login</a>
+      <a href="signup.html">Sign Up</a>
     </div>
   </nav>
   <div class="hero">
-    <h1>Join MyLangRead</h1>
-    <p>Create an account to start your personalized learning journey.</p>
+    <h1>Login to MyLangRead</h1>
+    <p>Access your personalized language learning tools.</p>
     <div class="login-box">
-      <h2>Sign Up</h2>
+      <h2>Login</h2>
       <input type="email" id="email" placeholder="Email">
       <input type="password" id="password" placeholder="Password">
-      <button onclick="signUp()">Sign Up</button>
+      <button onclick="emailLogin()">Login</button>
       <button class="google-btn" onclick="googleLogin()">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" class="google-icon">
-        Sign Up with Google
+        Login with Google
       </button>
       <div class="login-link">
-        <p>Already have an account? <a href="login.html">Login here</a></p>
+        <p>Don't have an account? <a href="signup.html">Sign up</a></p>
       </div>
     </div>
   </div>
