@@ -149,17 +149,26 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    let currentUser = null;
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+    });
+
     function saveLanguages() {
       const native = document.getElementById("native").value;
       const target = document.getElementById("target").value;
-      const user = auth.currentUser;
 
-      if (!native || !target || !user) {
+      if (!native || !target) {
         alert("Please select both languages.");
         return;
       }
 
-      db.collection("users").doc(user.uid).update({
+      if (!currentUser) {
+        alert("No user is logged in. Please sign up again.");
+        return;
+      }
+
+      db.collection("users").doc(currentUser.uid).update({
         nativeLanguage: native,
         targetLanguage: target
       }).then(() => {
