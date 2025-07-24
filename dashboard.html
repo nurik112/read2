@@ -5,6 +5,9 @@
   <title>Dashboard - MyLangRead</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <style>
     body {
       margin: 0;
@@ -59,7 +62,6 @@
       margin-top: 1rem;
     }
     .buttons button {
-      margin-right: 1rem;
       padding: 0.5rem 1rem;
       border: none;
       background-color: #667eea;
@@ -88,21 +90,32 @@
       <h1>Welcome back!</h1>
       <div>You have a <strong>1 day streak!</strong></div>
     </div>
+
     <div class="cards">
+      <div class="card" id="lastBookCard">
+        <h3>Last Read</h3>
+        <p><strong id="lastBookTitle">Loading...</strong></p>
+        <div style="background:#e0e0e0; border-radius:5px; overflow:hidden; height:10px;">
+          <div id="lastBookProgress" style="background:#667eea; height:10px; width:0%;"></div>
+        </div>
+      </div>
+
       <div class="card">
         <h3>Continue Reading</h3>
         <p>Pick up where you left off.</p>
         <div class="buttons">
-          <button>Continue</button>
+          <button onclick="window.location.href='library.html'">Continue</button>
         </div>
       </div>
+
       <div class="card">
         <h3>Start Practice</h3>
         <p>Review your saved flashcards.</p>
         <div class="buttons">
-          <button>Start</button>
+          <button onclick="window.location.href='flashcards.html'">Start</button>
         </div>
       </div>
+
       <div class="card">
         <h3>Daily Streak</h3>
         <p>Read 500 words or practice 10 flashcards every day to keep your streak going.</p>
@@ -110,10 +123,43 @@
       </div>
     </div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
+    // Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBRJw6Mp7H6F6p5kump5RWR007WJtAvP38",
+      authDomain: "read2-22428-2f702.firebaseapp.com",
+      projectId: "read2-22428-2f702",
+      storageBucket: "read2-22428-2f702.appspot.com",
+      messagingSenderId: "276542785997",
+      appId: "1:276542785997:web:8d36380461e3858e091c84"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) return window.location.href = "index.html";
+
+      const snapshot = await db.collection("books")
+        .where("uid", "==", user.uid)
+        .orderBy("timestamp", "desc")
+        .limit(1)
+        .get();
+
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data();
+        document.getElementById("lastBookTitle").innerText = data.filename;
+        document.getElementById("lastBookProgress").style.width = `${data.progress || 0}%`;
+      } else {
+        document.getElementById("lastBookTitle").innerText = "No books yet.";
+      }
+    });
+
+    // ChartJS
     const ctx = document.getElementById('streakChart').getContext('2d');
-    const streakChart = new Chart(ctx, {
+    new Chart(ctx, {
       type: 'bar',
       data: {
         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
