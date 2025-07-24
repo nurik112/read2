@@ -8,6 +8,7 @@
   <!-- Firebase CDN -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 
   <style>
     body {
@@ -24,28 +25,19 @@
     }
     .container {
       padding: 2rem;
-      max-width: 800px;
+      max-width: 900px;
       margin: auto;
       background: white;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    textarea {
+    textarea, input[type="text"], input[type="file"] {
       width: 100%;
-      height: 200px;
       margin-bottom: 1rem;
       padding: 1rem;
       font-size: 1rem;
       border-radius: 8px;
       border: 1px solid #ccc;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      margin-bottom: 1rem;
     }
     button {
       padding: 10px 20px;
@@ -55,9 +47,32 @@
       background-color: #2e86de;
       color: white;
       cursor: pointer;
+      margin-right: 10px;
     }
     button:hover {
       background-color: #2166c2;
+    }
+    .book-entry {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .progress-bar {
+      background-color: #ccc;
+      border-radius: 5px;
+      height: 10px;
+      width: 60%;
+      margin: 0 10px;
+    }
+    .progress-fill {
+      background-color: #2e86de;
+      height: 100%;
+      border-radius: 5px;
+      width: 0%;
     }
   </style>
 </head>
@@ -67,70 +82,106 @@
   </header>
 
   <div class="container">
-    <h2>Paste your text below</h2>
+    <p>Upload texts to read privately. Paste or upload your .txt files. Your data is saved securely to your account.</p>
+
+    <h2>Paste text</h2>
     <textarea id="pastedText" placeholder="Paste your text here..."></textarea>
     <input type="text" id="pastedFilename" placeholder="Enter filename (e.g. book.txt)" />
     <button id="saveTextBtn">Save Text</button>
+
+    <h2>Or upload a .txt file</h2>
+    <input type="file" id="fileInput" accept=".txt" />
+    <button id="uploadFileBtn">Upload File</button>
+
+    <h2 style="margin-top: 3rem;">Your Library</h2>
+    <div id="libraryList"></div>
   </div>
 
   <script>
-    // Firebase ayarları
     const firebaseConfig = {
       apiKey: "AIzaSyBRJw6Mp7H6F6p5kump5RWR007WJtAvP38",
       authDomain: "read2-22428-2f702.firebaseapp.com",
       projectId: "read2-22428-2f702",
       storageBucket: "read2-22428-2f702.appspot.com",
       messagingSenderId: "276542785997",
-      appId: "1:276542785997:web:8d36380461e3858e091c84",
-      measurementId: "G-00LNDDD9SL"
+      appId: "1:276542785997:web:8d36380461e3858e091c84"
     };
 
-    // Firebase başlat
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    // Giriş kontrolü
-    auth.onAuthStateChanged((user) => {
-      if (!user) {
-        window.location.href = "index.html";
-      }
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) return window.location.href = "index.html";
+      window.user = user;
+      loadBooks();
     });
+
+    async function loadBooks() {
+      const snapshot = await db.collection("books").where("uid", "==", user.uid).get();
+      const list = document.getElementById("libraryList");
+      list.innerHTML = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const div = document.createElement("div");
+        div.className = "book-entry";
+        div.innerHTML = `
+          <span>${data.filename}</span>
+          <div class="progress-bar"><div class="progress-fill" style="width: ${data.progress || 0}%"></div></div>
+          <button onclick="deleteBook('${doc.id}')">Delete</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    async function deleteBook(docId) {
+      await db.collection("books").doc(docId).delete();
+      loadBooks();
+    }
 
     document.getElementById("saveTextBtn").addEventListener("click", async () => {
       const content = document.getElementById("pastedText").value.trim();
       const filename = document.getElementById("pastedFilename").value.trim();
-
-      if (!content || !filename) {
-        alert("Please provide both filename and content.");
-        return;
-      }
-
-      const user = auth.currentUser;
-      if (!user) {
-        alert("You must be logged in.");
-        return;
-      }
+      if (!content || !filename) return alert("Please enter both filename and content.");
 
       const idToken = await user.getIdToken();
-
-      const response = await fetch("https://script.google.com/macros/s/AKfycbxtIeSqjpeDO0UWQ-UB9LliyPCq_lr65JOv9zJoLGwim4QIHSvheHsbH3Qegm4KSgL4jw/exec", {
+      const response = await fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${idToken}`,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          content: content,
-          filename: filename
-        })
+        body: JSON.stringify({ filename, content })
       });
 
-      const result = await response.json();
-      if (result.success) {
-        alert("✅ File uploaded successfully!");
-      } else {
-        alert("❌ Error: " + result.error);
-      }
+      await db.collection("books").add({ filename, uid: user.uid, progress: 0 });
+      alert("Text saved successfully!");
+      loadBooks();
+    });
+
+    document.getElementById("uploadFileBtn").addEventListener("click", () => {
+      const file = document.getElementById("fileInput").files[0];
+      if (!file || file.type !== "text/plain") return alert("Please upload a valid .txt file.");
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const content = e.target.result;
+        const filename = file.name;
+        const idToken = await user.getIdToken();
+        await fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${idToken}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ filename, content })
+        });
+
+        await db.collection("books").add({ filename, uid: user.uid, progress: 0 });
+        alert("File uploaded successfully!");
+        loadBooks();
+      };
+      reader.readAsText(file);
     });
   </script>
 </body>
