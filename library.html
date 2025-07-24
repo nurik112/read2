@@ -2,157 +2,116 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Kitaplığım</title>
+  <title>MyLangRead - Kitap Yükle ve Kitaplarım</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: #f4f6f9;
       font-family: 'Inter', sans-serif;
+      background: #f9fafb;
       color: #333;
     }
     header {
-      background-color: #43B08A;
+      background: #43B08A;
       color: white;
       padding: 1rem 2rem;
       font-size: 1.6rem;
-      font-weight: 600;
     }
     .container {
-      padding: 2rem;
       max-width: 800px;
       margin: auto;
+      padding: 2rem;
     }
-    .file-item {
+    .upload-box {
       background: white;
+      border: 2px dashed #ccc;
+      padding: 2rem;
+      text-align: center;
       border-radius: 12px;
-      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .upload-box:hover {
+      background-color: #f1f1f1;
+    }
+    .upload-box input[type="file"] {
+      display: none;
+    }
+    .upload-label {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background: #43B08A;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 1rem;
+    }
+    .file-list .file-item {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
       margin-bottom: 1rem;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
       position: relative;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-    .file-item:hover {
-      transform: scale(1.01);
     }
     .file-title {
-      font-size: 1.2rem;
       font-weight: 600;
+      font-size: 1.1rem;
     }
     .file-meta {
       font-size: 0.9rem;
       color: #777;
-      margin-top: 0.4rem;
     }
     .progress-bar {
       background: #eee;
-      border-radius: 10px;
+      border-radius: 8px;
       overflow: hidden;
-      height: 10px;
-      margin-top: 10px;
+      height: 8px;
+      margin-top: 8px;
     }
     .progress {
       height: 100%;
       background: #43B08A;
       width: 0%;
-      transition: width 0.3s;
     }
     .delete-btn {
       position: absolute;
-      top: 15px;
-      right: 15px;
+      right: 10px;
+      top: 10px;
       background: none;
       border: none;
       font-size: 1.2rem;
-      color: #888;
       cursor: pointer;
+      color: #888;
     }
-    .delete-btn:hover {
-      color: red;
-    }
+    .delete-btn:hover { color: red; }
   </style>
 </head>
 <body>
-
-<header>📚 Kitaplığım</header>
+<header>📚 MyLangRead - Kitap Yükle</header>
 <div class="container">
-  <div id="fileList">Giriş kontrol ediliyor...</div>
+
+  <!-- Yükleme Kutusu -->
+  <div class="upload-box">
+    <p>Metin dosyanı buraya sürükle veya bir dosya seç.</p>
+    <label class="upload-label" for="fileInput">Dosya Yükle</label>
+    <input type="file" id="fileInput" accept=".txt" />
+  </div>
+
+  <!-- Kitap Listesi -->
+  <div id="fileList" class="file-list">
+    <p>Yüklenmiş kitapların buraya gelecek...</p>
+  </div>
 </div>
 
-<!-- Firebase compat SDK -->
+<!-- Firebase entegresi burada olacak -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
 <script>
-  // Firebase ayarları
-  const firebaseConfig = {
-    apiKey: "AIzaSyCRSfHfAntvwULjnhdxiZyxIPWOTTQdJu8",
-    authDomain: "read2-22428.firebaseapp.com",
-    projectId: "read2-22428",
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  const fileListDiv = document.getElementById("fileList");
-
-  auth.onAuthStateChanged(async (user) => {
-    if (!user) {
-      fileListDiv.innerHTML = "Yönlendiriliyorsunuz...";
-      setTimeout(() => window.location.href = "index.html", 1000);
-      return;
-    }
-
-    const q = await db.collection("files").where("userId", "==", user.uid).get();
-
-    fileListDiv.innerHTML = "";
-
-    if (q.empty) {
-      fileListDiv.innerHTML = "<p>Hiç dosyanız yok.</p>";
-      return;
-    }
-
-    q.forEach((docSnap) => {
-      const data = docSnap.data();
-      const item = document.createElement("div");
-      item.className = "file-item";
-
-      const progress = data.progress || 0;
-
-      item.innerHTML = `
-        <button class="delete-btn" title="Sil">🗑️</button>
-        <div class="file-title">${data.filename || "İsimsiz dosya"}</div>
-        <div class="file-meta">
-          Dil: ${data.language || "Bilinmiyor"} |
-          Tarih: ${new Date(data.timestamp?.seconds * 1000).toLocaleDateString()}
-        </div>
-        <div class="progress-bar"><div class="progress" style="width:${progress}%"></div></div>
-      `;
-
-      // Silme butonu
-      item.querySelector(".delete-btn").onclick = async (e) => {
-        e.stopPropagation();
-        if (confirm("Bu kitabı silmek istediğinize emin misiniz?")) {
-          await db.collection("files").doc(docSnap.id).delete();
-          item.remove();
-        }
-      };
-
-      // Okumaya geçiş
-      item.onclick = (e) => {
-        if (!e.target.classList.contains("delete-btn")) {
-          window.location.href = `reader.html?fileId=${docSnap.id}`;
-        }
-      };
-
-      fileListDiv.appendChild(item);
-    });
-  });
+  // Firebase kodları ve listeleme işlemleri buraya eklenecek
 </script>
-
 </body>
 </html>
