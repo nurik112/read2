@@ -1,106 +1,157 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>MyLangRead - Library</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-
-  <!-- Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCRSfHfAntvwULjnhdxiZyxIPWOTTQdJu8",
-      authDomain: "read2-22428.firebaseapp.com",
-      projectId: "read2-22428",
-      storageBucket: "read2-22428.firebasestorage.app",
-      messagingSenderId: "638272572521",
-      appId: "1:638272572521:web:5581ab23942d49593ca6f8",
-      measurementId: "G-31PBME5TMN"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // Kullanıcı oturumunu kontrol et
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        document.getElementById("welcome").textContent = `Welcome, ${user.email}`;
-      } else {
-        window.location.href = "index.html";
-      }
-    });
-
-    // Çıkış fonksiyonu
-    window.logout = async function () {
-      await signOut(auth);
-      window.location.href = "index.html";
-    };
-  </script>
-
+  <meta charset="UTF-8">
+  <title>Kitaplığım</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(120deg, #1e1e1e, #2c3e50);
-      color: white;
       margin: 0;
-      padding: 0;
+      background: #f4f6f9;
+      font-family: 'Inter', sans-serif;
+      color: #333;
     }
-
-    nav {
-      background-color: #122236;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    nav .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-
-    nav .menu a, .menu button {
+    header {
+      background-color: #43B08A;
       color: white;
-      margin-left: 1.5rem;
-      text-decoration: none;
-      font-weight: 500;
+      padding: 1rem 2rem;
+      font-size: 1.6rem;
+      font-weight: 600;
+    }
+    .container {
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    .file-item {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .file-item:hover {
+      transform: scale(1.01);
+    }
+    .file-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    .file-meta {
+      font-size: 0.9rem;
+      color: #777;
+      margin-top: 0.4rem;
+    }
+    .progress-bar {
+      background: #eee;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 10px;
+      margin-top: 10px;
+    }
+    .progress {
+      height: 100%;
+      background: #43B08A;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    .delete-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
       background: none;
       border: none;
+      font-size: 1.2rem;
+      color: #888;
       cursor: pointer;
-      font-size: 1rem;
     }
-
-    .library-container {
-      text-align: center;
-      padding: 60px 20px;
-    }
-
-    .library-container h1 {
-      font-size: 2.2rem;
-      margin-bottom: 1rem;
-    }
-
-    .library-container p {
-      font-size: 1.1rem;
-      opacity: 0.8;
+    .delete-btn:hover {
+      color: red;
     }
   </style>
 </head>
 <body>
-  <nav>
-    <div class="logo">MyLangRead</div>
-    <div class="menu">
-      <a href="texts.html">Texts</a>
-      <a href="flashcards.html">Flashcards</a>
-      <button onclick="logout()">Logout</button>
-    </div>
-  </nav>
 
-  <div class="library-container">
-    <h1 id="welcome">Loading...</h1>
-    <p>This is your personal library. You'll soon see your saved texts and flashcards here.</p>
-  </div>
+<header>📚 Kitaplığım</header>
+<div class="container">
+  <div id="fileList">Yüklenmiş kitaplarınız yükleniyor...</div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, query, where, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  // 🔐 Firebase yapılandırması
+  const firebaseConfig = {
+    apiKey: "SENİN_API_KEYİN",
+    authDomain: "SENIN-PROJE.firebaseapp.com",
+    projectId: "SENIN_PROJE_ID",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  const fileList = document.getElementById("fileList");
+
+  // 🔍 Kullanıcı oturumu
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "index.html"; // Giriş yapılmadıysa yönlendir
+      return;
+    }
+
+    const q = query(collection(db, "files"), where("userId", "==", user.uid));
+    const querySnapshot = await getDocs(q);
+
+    fileList.innerHTML = "";
+
+    if (querySnapshot.empty) {
+      fileList.innerHTML = "<p>Hiç dosya yüklememişsiniz.</p>";
+      return;
+    }
+
+    querySnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const item = document.createElement("div");
+      item.className = "file-item";
+
+      const progress = data.progress || 0;
+
+      item.innerHTML = `
+        <button class="delete-btn" title="Sil">🗑️</button>
+        <div class="file-title">${data.filename || "İsimsiz kitap"}</div>
+        <div class="file-meta">
+          Dil: ${data.language || "Bilinmiyor"} |
+          Tarih: ${new Date(data.timestamp?.seconds * 1000).toLocaleDateString()}
+        </div>
+        <div class="progress-bar"><div class="progress" style="width:${progress}%"></div></div>
+      `;
+
+      // Silme
+      item.querySelector(".delete-btn").onclick = async (e) => {
+        e.stopPropagation();
+        if (confirm("Bu kitabı silmek istediğinize emin misiniz?")) {
+          await deleteDoc(doc(db, "files", docSnap.id));
+          item.remove();
+        }
+      };
+
+      // Okuma sayfasına yönlendirme
+      item.onclick = (e) => {
+        if (e.target.classList.contains("delete-btn")) return;
+        window.location.href = `reader.html?fileId=${docSnap.id}`;
+      };
+
+      fileList.appendChild(item);
+    });
+  });
+</script>
+
 </body>
 </html>
