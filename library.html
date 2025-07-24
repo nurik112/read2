@@ -201,7 +201,7 @@
         const filename = file.name;
         const idToken = await user.getIdToken();
 
-        await fetch("https://script.google.com/macros/s/Yhttps://script.google.com/macros/s/AKfycbxtIeSqjpeDO0UWQ-UB9LliyPCq_lr65JOv9zJoLGwim4QIHSvheHsbH3Qegm4KSgL4jw/exec", {
+        await fetch("https://script.google.com/macros/s/AKfycbxtIeSqjpeDO0UWQ-UB9LliyPCq_lr65JOv9zJoLGwim4QIHSvheHsbH3Qegm4KSgL4jw/exec", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${idToken}`,
