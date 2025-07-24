@@ -1,131 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MyLangRead - Library</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-
-  <!-- Firebase (compat) -->
+  <meta charset="UTF-8" />
+  <title>MyLangRead - Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
   <style>
     body {
       font-family: 'Inter', sans-serif;
       background: #f5f5f5;
-      margin: 0;
-      padding: 0;
-    }
-    nav {
-      background-color: #122236;
-      padding: 1rem 2rem;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
+      height: 100vh;
+      margin: 0;
     }
-    nav .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: white;
-    }
-    nav .menu a {
-      color: white;
-      margin-left: 1.5rem;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    header {
-      background-color: #1e1e1e;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-    .container {
-      padding: 2rem;
-      max-width: 900px;
-      margin: auto;
+    .login-box {
       background: white;
+      padding: 2rem;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    textarea, input[type="text"], input[type="file"] {
       width: 100%;
-      margin-bottom: 1rem;
+      max-width: 400px;
+      text-align: center;
+    }
+    input {
+      width: 100%;
       padding: 1rem;
-      font-size: 1rem;
-      border-radius: 8px;
+      margin-bottom: 1rem;
       border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
     }
     button {
-      padding: 10px 20px;
+      width: 100%;
+      padding: 1rem;
       font-size: 1rem;
-      border: none;
-      border-radius: 8px;
       background-color: #2e86de;
       color: white;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
-      margin-right: 10px;
     }
     button:hover {
       background-color: #2166c2;
     }
-    .book-entry {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background-color: #f0f0f0;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
-    .progress-bar {
-      background-color: #ccc;
-      border-radius: 5px;
-      height: 10px;
-      width: 60%;
-      margin: 0 10px;
-    }
-    .progress-fill {
-      background-color: #2e86de;
-      height: 100%;
-      border-radius: 5px;
-      width: 0%;
-    }
   </style>
 </head>
 <body>
-
-  <!-- Menüler -->
-  <nav>
-    <div class="logo">MyLangRead</div>
-    <div class="menu">
-      <a href="dashboard.html">Home</a>
-      <a href="library.html">Library</a>
-      <a href="texts.html">Texts</a>
-      <a href="flashcards.html">Flashcards</a>
-      <a href="signup.html">Sign Up</a>
-    </div>
-  </nav>
-
-  <header>
-    <h1>MyLangRead Library</h1>
-  </header>
-
-  <div class="container">
-    <p>Upload texts to read privately. Paste or upload your .txt files. Your data is saved securely to your account.</p>
-
-    <h2>Paste text</h2>
-    <textarea id="pastedText" placeholder="Paste your text here..."></textarea>
-    <input type="text" id="pastedFilename" placeholder="Enter filename (e.g. book.txt)" />
-    <button id="saveTextBtn">Save Text</button>
-
-    <h2>Or upload a .txt file</h2>
-    <input type="file" id="fileInput" accept=".txt" />
-    <button id="uploadFileBtn">Upload File</button>
-
-    <h2 style="margin-top: 3rem;">Your Library</h2>
-    <div id="libraryList"></div>
+  <div class="login-box">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <p id="message" style="color:red; margin-top: 1rem;"></p>
   </div>
 
   <script>
@@ -140,82 +70,26 @@
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.firestore();
-    let user = null;
 
-    auth.onAuthStateChanged(async (u) => {
-      if (!u) return window.location.href = "index.html";
-      user = u;
-      loadBooks();
+    // Kullanıcı zaten giriş yapmışsa yönlendir
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        window.location.href = "dashboard.html";
+      }
     });
 
-    async function loadBooks() {
-      const snapshot = await db.collection("books").where("uid", "==", user.uid).get();
-      const list = document.getElementById("libraryList");
-      list.innerHTML = "";
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const div = document.createElement("div");
-        div.className = "book-entry";
-        div.innerHTML = `
-          <span>${data.filename}</span>
-          <div class="progress-bar"><div class="progress-fill" style="width: ${data.progress || 0}%"></div></div>
-          <button onclick="deleteBook('${doc.id}')">Delete</button>
-        `;
-        list.appendChild(div);
-      });
+    async function login() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const message = document.getElementById("message");
+
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        // Başarılı girişte otomatik yönlendirme yapılacak (onAuthStateChanged içinde)
+      } catch (err) {
+        message.textContent = err.message;
+      }
     }
-
-    async function deleteBook(docId) {
-      await db.collection("books").doc(docId).delete();
-      loadBooks();
-    }
-
-    document.getElementById("saveTextBtn").addEventListener("click", async () => {
-      const content = document.getElementById("pastedText").value.trim();
-      const filename = document.getElementById("pastedFilename").value.trim();
-      if (!content || !filename) return alert("Please enter both filename and content.");
-      const idToken = await user.getIdToken();
-
-      await fetch("https://script.google.com/macros/s/AKfycbxtIeSqjpeDO0UWQ-UB9LliyPCq_lr65JOv9zJoLGwim4QIHSvheHsbH3Qegm4KSgL4jw/exec", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${idToken}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ filename, content })
-      });
-
-      await db.collection("books").add({ filename, uid: user.uid, progress: 0 });
-      alert("Text saved successfully!");
-      loadBooks();
-    });
-
-    document.getElementById("uploadFileBtn").addEventListener("click", () => {
-      const file = document.getElementById("fileInput").files[0];
-      if (!file || file.type !== "text/plain") return alert("Please upload a valid .txt file.");
-      const reader = new FileReader();
-
-      reader.onload = async (e) => {
-        const content = e.target.result;
-        const filename = file.name;
-        const idToken = await user.getIdToken();
-
-        await fetch("https://script.google.com/macros/s/AKfycbxtIeSqjpeDO0UWQ-UB9LliyPCq_lr65JOv9zJoLGwim4QIHSvheHsbH3Qegm4KSgL4jw/exec", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${idToken}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ filename, content })
-        });
-
-        await db.collection("books").add({ filename, uid: user.uid, progress: 0 });
-        alert("File uploaded successfully!");
-        loadBooks();
-      };
-      reader.readAsText(file);
-    });
   </script>
 </body>
 </html>
