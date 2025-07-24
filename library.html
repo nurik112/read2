@@ -35,6 +35,16 @@
       text-decoration: none;
       font-weight: 500;
     }
+    nav .menu button {
+      margin-left: 1.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      background-color: #f53b57;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
     header {
       background-color: #1e1e1e;
       color: white;
@@ -96,7 +106,7 @@
 </head>
 <body>
 
-  <!-- Menüler -->
+  <!-- Navbar -->
   <nav>
     <div class="logo">MyLangRead</div>
     <div class="menu">
@@ -105,6 +115,7 @@
       <a href="texts.html">Texts</a>
       <a href="flashcards.html">Flashcards</a>
       <a href="signup.html">Sign Up</a>
+      <button onclick="logout()">Sign Out</button>
     </div>
   </nav>
 
@@ -177,7 +188,7 @@
       if (!content || !filename) return alert("Please enter both filename and content.");
       const idToken = await user.getIdToken();
 
-      await fetch("https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbxtIeSqjpeDO0UWQ-UB9LliyPCq_lr65JOv9zJoLGwim4QIHSvheHsbH3Qegm4KSgL4jw/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbxtIeSqjpeDO0UWQ-UB9LliyPCq_lr65JOv9zJoLGwim4QIHSvheHsbH3Qegm4KSgL4jw/exec", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${idToken}`,
@@ -216,6 +227,10 @@
       };
       reader.readAsText(file);
     });
+
+    function logout() {
+      auth.signOut().then(() => window.location.href = "index.html");
+    }
   </script>
 </body>
 </html>
