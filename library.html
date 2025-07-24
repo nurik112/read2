@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>MyLangRead - Kitap Yükle ve Kitaplarım</title>
+  <title>MyLangRead - Upload & Library</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -48,6 +48,32 @@
       font-weight: 600;
       margin-top: 1rem;
     }
+    .text-input {
+      margin-top: 2rem;
+      text-align: left;
+    }
+    .text-input textarea {
+      width: 100%;
+      height: 200px;
+      padding: 1rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+    }
+    .text-input button {
+      margin-top: 1rem;
+      background: #43B08A;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .text-input button:hover {
+      background: #36916f;
+    }
     .file-list .file-item {
       background: white;
       padding: 1rem;
@@ -90,28 +116,44 @@
   </style>
 </head>
 <body>
-<header>📚 MyLangRead - Kitap Yükle</header>
+<header>📚 MyLangRead - Upload</header>
 <div class="container">
 
-  <!-- Yükleme Kutusu -->
+  <!-- Upload Box -->
   <div class="upload-box">
-    <p>Metin dosyanı buraya sürükle veya bir dosya seç.</p>
-    <label class="upload-label" for="fileInput">Dosya Yükle</label>
+    <h2>Upload</h2>
+    <p>Upload texts to read privately or study with AI tools.</p>
+    <p><strong>Either</strong> paste text below<br><strong>or</strong> choose a .txt file</p>
+
+    <label class="upload-label" for="fileInput">Choose File</label>
     <input type="file" id="fileInput" accept=".txt" />
+
+    <p style="margin-top:1rem; color:#777">Supported formats: .txt only</p>
+    <p style="color:#999; font-size: 0.9rem; max-width: 500px; margin: 0 auto;">
+      Trouble uploading? Use free tools like Notepad or Calibre to convert books to plain text first.
+    </p>
   </div>
 
-  <!-- Kitap Listesi -->
+  <!-- Paste Text Box -->
+  <div class="text-input">
+    <label for="pastedText"><strong>Paste Text</strong></label>
+    <textarea id="pastedText" placeholder="Paste your text here..."></textarea>
+    <button onclick="savePastedText()">Save Text</button>
+  </div>
+
+  <!-- File List -->
   <div id="fileList" class="file-list">
-    <p>Yüklenmiş kitapların buraya gelecek...</p>
+    <h3>Your Library</h3>
+    <p>Uploaded texts will appear below...</p>
   </div>
 </div>
 
-<!-- Firebase entegresi burada olacak -->
+<!-- Firebase Integration (placeholder) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-  // Firebase kodları ve listeleme işlemleri buraya eklenecek
+  // Firebase initialization and logic goes here
 </script>
 </body>
 </html>
