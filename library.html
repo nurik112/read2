@@ -2,158 +2,140 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>MyLangRead - Upload & Library</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <title>MyLangRead - Library</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Firebase Setup -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "BURAYA_FIREBASE_API_KEYİNİ_YAZ",
+      authDomain: "read2-22428.firebaseapp.com",
+      projectId: "read2-22428",
+      storageBucket: "read2-22428.appspot.com",
+      messagingSenderId: "638272572521",
+      appId: "1:638272572521:web:5581ab23942d49593ca6f8",
+      measurementId: "G-31PBME5TMN"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    window.auth = auth;
+
+    // Kullanıcı giriş yapmamışsa index.html'e yönlendir
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+
   <style>
-    * { box-sizing: border-box; }
     body {
-      margin: 0;
       font-family: 'Inter', sans-serif;
-      background: #f9fafb;
-      color: #333;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
     }
     header {
-      background: #43B08A;
+      background-color: #1e1e1e;
       color: white;
-      padding: 1rem 2rem;
-      font-size: 1.6rem;
+      padding: 1rem;
+      text-align: center;
     }
     .container {
+      padding: 2rem;
       max-width: 800px;
       margin: auto;
-      padding: 2rem;
-    }
-    .upload-box {
       background: white;
-      border: 2px dashed #ccc;
-      padding: 2rem;
-      text-align: center;
       border-radius: 12px;
-      margin-bottom: 2rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    .upload-box:hover {
-      background-color: #f1f1f1;
-    }
-    .upload-box input[type="file"] {
-      display: none;
-    }
-    .upload-label {
-      display: inline-block;
-      padding: 1rem 2rem;
-      background: #43B08A;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      margin-top: 1rem;
-    }
-    .text-input {
-      margin-top: 2rem;
-      text-align: left;
-    }
-    .text-input textarea {
+    textarea {
       width: 100%;
       height: 200px;
-      padding: 1rem;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      font-family: 'Inter', sans-serif;
-    }
-    .text-input button {
-      margin-top: 1rem;
-      background: #43B08A;
-      color: white;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      font-size: 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .text-input button:hover {
-      background: #36916f;
-    }
-    .file-list .file-item {
-      background: white;
-      padding: 1rem;
-      border-radius: 10px;
       margin-bottom: 1rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      position: relative;
-    }
-    .file-title {
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-    .file-meta {
-      font-size: 0.9rem;
-      color: #777;
-    }
-    .progress-bar {
-      background: #eee;
+      padding: 1rem;
+      font-size: 1rem;
       border-radius: 8px;
-      overflow: hidden;
-      height: 8px;
-      margin-top: 8px;
+      border: 1px solid #ccc;
     }
-    .progress {
-      height: 100%;
-      background: #43B08A;
-      width: 0%;
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 1rem;
     }
-    .delete-btn {
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      background: none;
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
       border: none;
-      font-size: 1.2rem;
+      border-radius: 8px;
+      background-color: #2e86de;
+      color: white;
       cursor: pointer;
-      color: #888;
     }
-    .delete-btn:hover { color: red; }
+    button:hover {
+      background-color: #2166c2;
+    }
   </style>
 </head>
 <body>
-<header>📚 MyLangRead - Upload</header>
-<div class="container">
+  <header>
+    <h1>MyLangRead Library</h1>
+  </header>
 
-  <!-- Upload Box -->
-  <div class="upload-box">
-    <h2>Upload</h2>
-    <p>Upload texts to read privately or study with AI tools.</p>
-    <p><strong>Either</strong> paste text below<br><strong>or</strong> choose a .txt file</p>
-
-    <label class="upload-label" for="fileInput">Choose File</label>
-    <input type="file" id="fileInput" accept=".txt" />
-
-    <p style="margin-top:1rem; color:#777">Supported formats: .txt only</p>
-    <p style="color:#999; font-size: 0.9rem; max-width: 500px; margin: 0 auto;">
-      Trouble uploading? Use free tools like Notepad or Calibre to convert books to plain text first.
-    </p>
-  </div>
-
-  <!-- Paste Text Box -->
-  <div class="text-input">
-    <label for="pastedText"><strong>Paste Text</strong></label>
+  <div class="container">
+    <h2>Paste your text below</h2>
     <textarea id="pastedText" placeholder="Paste your text here..."></textarea>
-    <button onclick="savePastedText()">Save Text</button>
+    <input type="text" id="pastedFilename" placeholder="Enter filename (e.g. book.txt)" />
+    <button id="saveTextBtn">Save Text</button>
   </div>
 
-  <!-- File List -->
-  <div id="fileList" class="file-list">
-    <h3>Your Library</h3>
-    <p>Uploaded texts will appear below...</p>
-  </div>
-</div>
+  <script type="module">
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    const auth = getAuth();
 
-<!-- Firebase Integration (placeholder) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script>
-  // Firebase initialization and logic goes here
-</script>
+    document.getElementById("saveTextBtn").addEventListener("click", async () => {
+      const content = document.getElementById("pastedText").value;
+      const filename = document.getElementById("pastedFilename").value;
+
+      if (!content || !filename) {
+        alert("Please provide both filename and content.");
+        return;
+      }
+
+      const user = auth.currentUser;
+      if (!user) {
+        alert("You must be logged in.");
+        return;
+      }
+
+      const idToken = await user.getIdToken();
+
+      const response = await fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${idToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          content: content,
+          filename: filename
+        })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        alert("File uploaded successfully!");
+      } else {
+        alert("Error: " + result.error);
+      }
+    });
+  </script>
 </body>
 </html>
