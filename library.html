@@ -5,32 +5,9 @@
   <title>MyLangRead - Library</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- Firebase Setup -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBRJw6Mp7H6F6p5kump5RWR007WJtAvP38",
-      authDomain: "read2-22428-2f702.firebaseapp.com",
-      projectId: "read2-22428-2f702",
-      storageBucket: "read2-22428-2f702.firebasestorage.ap",
-      messagingSenderId: "276542785997",
-      appId: "1:276542785997:web:8d36380461e3858e091c84",
-      measurementId: "G-00LNDDD9SL"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    window.auth = auth;
-
-    // Kullanıcı giriş yapmamışsa index.html'e yönlendir
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-      }
-    });
-  </script>
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
 
   <style>
     body {
@@ -96,13 +73,32 @@
     <button id="saveTextBtn">Save Text</button>
   </div>
 
-  <script type="module">
-    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    const auth = getAuth();
+  <script>
+    // Firebase ayarları
+    const firebaseConfig = {
+      apiKey: "AIzaSyBRJw6Mp7H6F6p5kump5RWR007WJtAvP38",
+      authDomain: "read2-22428-2f702.firebaseapp.com",
+      projectId: "read2-22428-2f702",
+      storageBucket: "read2-22428-2f702.appspot.com",
+      messagingSenderId: "276542785997",
+      appId: "1:276542785997:web:8d36380461e3858e091c84",
+      measurementId: "G-00LNDDD9SL"
+    };
+
+    // Firebase başlat
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Giriş kontrolü
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        window.location.href = "index.html";
+      }
+    });
 
     document.getElementById("saveTextBtn").addEventListener("click", async () => {
-      const content = document.getElementById("pastedText").value;
-      const filename = document.getElementById("pastedFilename").value;
+      const content = document.getElementById("pastedText").value.trim();
+      const filename = document.getElementById("pastedFilename").value.trim();
 
       if (!content || !filename) {
         alert("Please provide both filename and content.");
@@ -117,7 +113,7 @@
 
       const idToken = await user.getIdToken();
 
-      const response = await fetch("https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbxtIeSqjpeDO0UWQ-UB9LliyPCq_lr65JOv9zJoLGwim4QIHSvheHsbH3Qegm4KSgL4jw/exec", {
+      const response = await fetch("https://script.google.com/macros/s/AKfycbxtIeSqjpeDO0UWQ-UB9LliyPCq_lr65JOv9zJoLGwim4QIHSvheHsbH3Qegm4KSgL4jw/exec", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${idToken}`,
@@ -131,9 +127,9 @@
 
       const result = await response.json();
       if (result.success) {
-        alert("File uploaded successfully!");
+        alert("✅ File uploaded successfully!");
       } else {
-        alert("Error: " + result.error);
+        alert("❌ Error: " + result.error);
       }
     });
   </script>
