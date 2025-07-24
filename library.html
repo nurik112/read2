@@ -145,7 +145,7 @@
       if (!content || !filename) return alert("Please enter both filename and content.");
 
       const idToken = await user.getIdToken();
-      const response = await fetch("https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbxtIeSqjpeDO0UWQ-UB9LliyPCq_lr65JOv9zJoLGwim4QIHSvheHsbH3Qegm4KSgL4jw/exec", {
+      const response = await fetch("https://script.google.com/macros/s/AKfycbxtIeSqjpeDO0UWQ-UB9LliyPCq_lr65JOv9zJoLGwim4QIHSvheHsbH3Qegm4KSgL4jw/exec", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${idToken}`,
@@ -154,9 +154,14 @@
         body: JSON.stringify({ filename, content })
       });
 
-      await db.collection("books").add({ filename, uid: user.uid, progress: 0 });
-      alert("Text saved successfully!");
-      loadBooks();
+      const result = await response.json();
+      if (result.success) {
+        await db.collection("books").add({ filename, uid: user.uid, progress: 0 });
+        alert("Text saved successfully!");
+        loadBooks();
+      } else {
+        alert("Upload failed: " + result.error);
+      }
     });
 
     document.getElementById("uploadFileBtn").addEventListener("click", () => {
@@ -168,7 +173,7 @@
         const content = e.target.result;
         const filename = file.name;
         const idToken = await user.getIdToken();
-        await fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbxtIeSqjpeDO0UWQ-UB9LliyPCq_lr65JOv9zJoLGwim4QIHSvheHsbH3Qegm4KSgL4jw/exec", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${idToken}`,
@@ -177,9 +182,14 @@
           body: JSON.stringify({ filename, content })
         });
 
-        await db.collection("books").add({ filename, uid: user.uid, progress: 0 });
-        alert("File uploaded successfully!");
-        loadBooks();
+        const result = await response.json();
+        if (result.success) {
+          await db.collection("books").add({ filename, uid: user.uid, progress: 0 });
+          alert("File uploaded successfully!");
+          loadBooks();
+        } else {
+          alert("Upload failed: " + result.error);
+        }
       };
       reader.readAsText(file);
     });
