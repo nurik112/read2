@@ -5,10 +5,10 @@
   <title>MyLangRead - Library</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <!-- Firebase (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
   <style>
     body {
@@ -34,16 +34,6 @@
       margin-left: 1.5rem;
       text-decoration: none;
       font-weight: 500;
-    }
-    nav .menu button {
-      margin-left: 1.5rem;
-      padding: 0.5rem 1rem;
-      font-size: 0.9rem;
-      background-color: #f53b57;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
     }
     header {
       background-color: #1e1e1e;
@@ -106,16 +96,15 @@
 </head>
 <body>
 
-  <!-- Navbar -->
+  <!-- Menüler -->
   <nav>
     <div class="logo">MyLangRead</div>
     <div class="menu">
-      <a href="index.html">Home</a>
+      <a href="dashboard.html">Home</a>
       <a href="library.html">Library</a>
       <a href="texts.html">Texts</a>
       <a href="flashcards.html">Flashcards</a>
       <a href="signup.html">Sign Up</a>
-      <button onclick="logout()">Sign Out</button>
     </div>
   </nav>
 
@@ -227,10 +216,6 @@
       };
       reader.readAsText(file);
     });
-
-    function logout() {
-      auth.signOut().then(() => window.location.href = "index.html");
-    }
   </script>
 </body>
 </html>
